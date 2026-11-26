@@ -1,9 +1,9 @@
-name: votes-intentions-politiques
+name: girouette
 
 services:
   app:
     build: .
-    image: votes-intentions-politiques
+    image: girouette
     ports:
       - "${APP_PORT:-8090}:8000"
     env_file:

@@ -1,4 +1,6 @@
-# Votes & intentions politiques
+# Girouette
+
+*Qui vote dans le sens de ce qu'il annonce ?*
 
 > Mettre en regard les grands objectifs affichés par les partis (réduire la pauvreté, sauver l'hôpital public, etc.) et ce qu'ils votent réellement à l'Assemblée nationale et au Parlement européen.
 
@@ -106,7 +108,7 @@ docker compose -f docker-compose.yml exec app python -m app.cli scores          
 docker compose -f docker-compose.yml exec app python -m app.cli prompt                 # prompt système du classement
 ```
 
-Tests : `docker run --rm -u root -v "$PWD":/src -w /src votes-intentions-politiques sh -c "pip install -q pytest && pytest -q"`
+Tests : `docker run --rm -u root -v "$PWD":/src -w /src girouette sh -c "pip install -q pytest && pytest -q"`
 
 ### Organisation du code
 

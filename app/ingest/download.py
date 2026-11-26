@@ -31,7 +31,7 @@ def download(url: str, dest: Path, force: bool = False, tentatives: int = 4) -> 
 def _download(url: str, dest: Path, force: bool) -> bool:
     dest.parent.mkdir(parents=True, exist_ok=True)
     meta_path = dest.with_suffix(dest.suffix + ".meta.json")
-    headers = {"User-Agent": "votes-intentions-politiques/0.1"}
+    headers = {"User-Agent": "girouette/0.1"}
     if dest.exists() and meta_path.exists() and not force:
         meta = json.loads(meta_path.read_text())
         if meta.get("etag"):

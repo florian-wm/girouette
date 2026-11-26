@@ -13,7 +13,8 @@ a:hover { text-decoration-color: currentColor; }
 main { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
 header.site { display: flex; justify-content: space-between; align-items: center; padding: .9rem 1.25rem; border-bottom: 1px solid var(--line); max-width: 1180px; margin: 0 auto; }
 header.site .brand { font-weight: 700; text-decoration: none; letter-spacing: -.01em; }
-header.site .brand span { color: var(--muted); }
+header.site .brand span { color: var(--muted); font-weight: 400; font-size: .9rem; }
+@media (max-width: 600px) { header.site .brand span { display: none; } }
 header.site nav a { margin-left: 1.25rem; text-decoration: none; color: var(--muted); }
 footer.site { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.25rem; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); }
 h1 { font-size: 1.9rem; line-height: 1.2; letter-spacing: -.02em; margin: .5rem 0 .75rem; }
