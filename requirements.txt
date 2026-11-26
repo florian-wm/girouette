@@ -1,0 +1,10 @@
+fastapi==0.118.*
+uvicorn[standard]==0.37.*
+jinja2==3.1.*
+python-multipart==0.0.*
+pyyaml==6.0.*
+httpx==0.28.*
+anthropic>=2.14,<3
+mistralai>=3.9,<4
+google-genai>=3.6,<4
+apscheduler==3.11.*

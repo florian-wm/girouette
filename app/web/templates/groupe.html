@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_badge, groupe_tag, position, polarite_txt %}
+{% block title %}{{ g.libelle }} · Votes & intentions{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/">Objectifs</a></p>
+<h1>{{ groupe_tag(g) }} {{ g.libelle }}</h1>
+<p class="lead">{{ g.membres or '?' }} députés · partis : {{ g.partis|join(', ') or 'non renseigné' }}</p>
+
+<table class="scores-groupe">
+{% for l in lignes %}
+<tr><th><a href="/objectifs/{{ l.objectif.slug }}">{{ l.objectif.libelle }}</a></th>
+<td>{{ score_badge(l.score.valeur if l.score else none, l.score.n_scrutins if l.score else 0) }}</td>
+<td class="meta">{{ l.score.n_scrutins if l.score else 0 }} scrutin(s){% if l.score and l.score.n_valides %}, dont {{ l.score.n_valides }} vérifié(s){% endif %}</td></tr>
+{% endfor %}
+</table>
+
+<h2>Derniers votes classés</h2>
+<table class="votes">
+  <thead><tr><th>Scrutin</th><th>Objectif</th><th>Vote du groupe</th></tr></thead>
+  <tbody>
+  {% for v in votes %}
+  <tr>
+    <td class="scr"><a href="/scrutins/{{ v.uid }}">{{ v.resume or v.titre }}</a>
+      <div class="meta">{{ v.date|date_fr }} · {{ NATURES[v.nature] }} · {{ polarite_txt(v.polarite) }}</div></td>
+    <td>{{ objectifs[v.objectif_slug].libelle }}</td>
+    <td>{{ position(v, v.polarite) }} <small class="meta">{{ v.pour }}/{{ v.contre }}/{{ v.abstentions }}</small></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

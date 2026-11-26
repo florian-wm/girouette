@@ -1,0 +1,29 @@
+{% macro score_badge(v, n=None) -%}
+{% if v is none %}<span class="score vide" title="Aucun scrutin classé">–</span>
+{%- else %}<span class="score" style="background: {{ couleur_score(v) }}" title="{{ n }} scrutin(s)">{{ "%.0f"|format(v) }}</span>{% endif %}
+{%- endmacro %}
+
+{% macro groupe_tag(g) -%}
+<span class="gtag"><i style="background: {{ g.couleur or '#888' }}"></i>{{ g.abrev or g.uid }}</span>
+{%- endmacro %}
+
+{% macro position(v, polarite) -%}
+{%- if v is none -%}<span class="pos absent">absent</span>
+{%- else -%}
+  {%- set exprimes = v.pour + v.contre + v.abstentions -%}
+  {%- if exprimes == 0 -%}<span class="pos absent">non votant</span>
+  {%- else -%}
+    {%- set p = (v.pour - v.contre) / exprimes -%}
+    {%- set aligne = p * polarite -%}
+    {%- if v.pour >= v.contre and v.pour >= v.abstentions -%}{%- set lib = "pour" -%}
+    {%- elif v.contre >= v.abstentions -%}{%- set lib = "contre" -%}
+    {%- else -%}{%- set lib = "abst." -%}{%- endif -%}
+    <span class="pos {{ 'avance' if aligne > 0.33 else ('recule' if aligne < -0.33 else 'neutre') }}"
+          title="{{ v.pour }} pour, {{ v.contre }} contre, {{ v.abstentions }} abst.">{{ lib }}{% if v.pour and v.contre %}*{% endif %}</span>
+  {%- endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro polarite_txt(p) -%}
+{% if p > 0 %}<span class="pol avance">voter pour fait avancer l'objectif</span>{% else %}<span class="pol recule">voter pour fait reculer l'objectif</span>{% endif %}
+{%- endmacro %}

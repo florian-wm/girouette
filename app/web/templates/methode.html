@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Méthode · Votes & intentions{% endblock %}
+{% block content %}
+<h1>Méthode</h1>
+
+<h2>Ce que mesure le score</h2>
+<p>Le site ne dit pas si une mesure est bonne ou efficace. Il mesure la <strong>cohérence entre un vote et l'objectif que le texte voté affiche lui-même</strong>.
+Exemple : un amendement qui « vise à revaloriser le RSA » est classé comme faisant avancer l'objectif « réduire la pauvreté ».
+Un groupe qui vote contre n'est pas pour autant « contre les pauvres » : il peut juger l'amendement mal financé, déjà satisfait ou mal rédigé.
+C'est pourquoi chaque score renvoie aux votes qui le composent.</p>
+
+<h2>Étapes</h2>
+<ol>
+  <li><strong>Collecte</strong> : chaque jour, les scrutins publics, votes nominatifs et amendements sont téléchargés depuis l'open data de l'Assemblée nationale. Aucune saisie manuelle des votes.</li>
+  <li><strong>Classement</strong> : un modèle d'IA (actuellement <code>{{ modele }}</code> ; le modèle utilisé est indiqué sur chaque classement) lit l'intitulé, le dossier et, pour un amendement, son dispositif et son exposé sommaire. Il indique les objectifs concernés, le sens d'un vote « pour », un niveau de confiance et une justification. Les classements de confiance inférieure à 40 % sont écartés.</li>
+  <li><strong>Agrégation</strong> : pour chaque scrutin, la position d'un groupe vaut (pour − contre) / (pour + contre + abstentions). Elle est multipliée par le sens (+1/−1) et pondérée par la nature du vote et par la confiance (100 % si un humain a vérifié le classement). Le résultat est ramené sur une échelle de 0 à 100.</li>
+  <li><strong>Contrôle</strong> : l'équipe vérifie un échantillon en commençant par les classements les moins sûrs. Elle peut valider, inverser ou rejeter un classement, et chaque changement est historisé. Tout visiteur peut signaler une erreur.</li>
+</ol>
+
+<h3>Pondération selon la nature du scrutin</h3>
+<table class="simple">{% for n, p in poids.items() %}<tr><td>{{ NATURES[n] }}</td><td>× {{ p }}</td></tr>{% endfor %}</table>
+
+<h2>Limites connues</h2>
+<ul>
+  <li><strong>Textes sans vote</strong> : un texte adopté via l'article 49.3 n'a pas de vote nominatif sur le fond. Seules les motions de censure qui l'accompagnent sont prises en compte. Or ce sont souvent les textes clés (budget, financement de la Sécurité sociale).</li>
+  <li><strong>Votes à main levée</strong> et votes en commission : non nominatifs, donc absents.</li>
+  <li><strong>Amendements</strong> : le texte de l'amendement est retrouvé automatiquement pour environ 70 % des scrutins d'amendement. Pour les autres, le classement repose sur l'intitulé seul et sa confiance est plafonnée.</li>
+  <li><strong>Groupes, pas partis</strong> : les scores portent sur les groupes parlementaires. La correspondance avec les partis est indicative et maintenue à la main.</li>
+  <li><strong>Le sens d'un vote est un jugement</strong> : il est fait par une IA puis vérifié par sondage. Les justifications sont publiées pour que chacun puisse les contester.</li>
+</ul>
+
+<h2>Objectifs suivis</h2>
+<dl>{% for o in objectifs %}<dt>{{ o.libelle }}</dt><dd>{{ o.description }}</dd>{% endfor %}</dl>
+
+<h2>Correspondance groupes ↔ partis</h2>
+<table class="simple">{% for abrev, g in groupes.items() %}<tr><td>{{ abrev }}</td><td>{{ g.partis|join(', ') }}</td></tr>{% endfor %}</table>
+
+<h2>Instructions données à l'IA (version {{ prompt_version }})</h2>
+<p class="meta">Publiées telles quelles. Le modèle doit répondre au format JSON ci-dessous.</p>
+<pre class="prompt">{{ prompt }}</pre>
+<details><summary>Format de réponse imposé</summary><pre class="prompt">{{ schema }}</pre></details>
+{% endblock %}

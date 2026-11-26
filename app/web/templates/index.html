@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_badge, groupe_tag %}
+{% block content %}
+<section class="intro">
+  <h1>Ce qu'ils annoncent, ce qu'ils votent</h1>
+  <p>Pour chaque grand objectif, le score indique à quel point les députés d'un groupe ont voté
+  <strong>dans le sens que les textes eux-mêmes affichent</strong> pour cet objectif.
+  <strong>100</strong> = toujours voté pour, <strong>0</strong> = toujours voté contre, <strong>50</strong> = partagé ou neutre.
+  Ce n'est pas une note sur l'efficacité des mesures : <a href="/methode">lire la méthode</a>.</p>
+  <p class="meta">Assemblée nationale, {{ legislature }}<sup>e</sup> législature · {{ stats.scrutins }} scrutins publics ·
+  {{ stats.classes }} rattachés à un objectif{% if stats.derniere_date %} · dernier scrutin le {{ stats.derniere_date|date_fr }}{% endif %}</p>
+</section>
+
+{% if not stats.classes %}
+<p class="notice">Aucun scrutin n'est encore classé. Lancez le pipeline (<code>python -m app.cli pipeline</code>) avec une clé API pour le fournisseur choisi (<code>LLM_PROVIDER</code>).</p>
+{% endif %}
+
+<div class="table-wrap">
+<table class="matrice">
+  <thead>
+    <tr><th></th>
+    {% for g in m.groupes %}<th><a href="/groupes/{{ g.abrev }}" title="{{ g.libelle }} — {{ g.partis|join(', ') }}">{{ groupe_tag(g) }}</a></th>{% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for l in m.lignes %}
+    <tr>
+      <th><a href="/objectifs/{{ l.objectif.slug }}">{{ l.objectif.libelle }}</a></th>
+      {% for c in l.cellules %}<td>{{ score_badge(c.valeur, c.n_scrutins) }}</td>{% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="legende"><span class="score" style="background: {{ couleur_score(5) }}">0</span> vote contre l'objectif affiché
+<span class="score" style="background: {{ couleur_score(50) }}">50</span> partagé
+<span class="score" style="background: {{ couleur_score(95) }}">100</span> vote pour l'objectif affiché ·
+survolez un score pour voir le nombre de scrutins.</p>
+{% endblock %}

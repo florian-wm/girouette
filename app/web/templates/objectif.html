@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_badge, groupe_tag, position, polarite_txt %}
+{% block title %}{{ o.libelle }} · Votes & intentions{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/">Objectifs</a></p>
+<h1>{{ o.libelle }}</h1>
+<p class="lead">{{ o.description }}</p>
+
+<h2>Score par groupe</h2>
+<ul class="classement">
+{% for x in classement %}
+  <li><a href="/groupes/{{ x.groupe.abrev }}">{{ groupe_tag(x.groupe) }}</a>
+    {{ score_badge(x.score.valeur if x.score else none, x.score.n_scrutins if x.score else 0) }}
+    <span class="bar"><span style="width: {{ x.score.valeur if x.score and x.score.valeur is not none else 0 }}%; background: {{ x.groupe.couleur }}"></span></span>
+    <small>{{ x.score.n_scrutins if x.score else 0 }} scrutin(s)</small></li>
+{% endfor %}
+</ul>
+
+<h2>Les {{ detail.scrutins|length }} scrutins pris en compte</h2>
+<p class="meta">Position majoritaire de chaque groupe. <span class="pos avance">bleu</span> = dans le sens de l'objectif affiché,
+<span class="pos recule">orange</span> = en sens inverse. * = groupe divisé.</p>
+<div class="table-wrap">
+<table class="votes">
+  <thead><tr><th>Scrutin</th>{% for g in groupes %}<th>{{ groupe_tag(g) }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for s in detail.scrutins %}
+  <tr>
+    <td class="scr">
+      <a href="/scrutins/{{ s.scrutin_uid }}">{{ s.resume or s.titre }}</a>
+      <div class="meta">{{ s.date|date_fr }} · {{ NATURES[s.nature] }} · {{ s.sort }} · {{ polarite_txt(s.polarite) }}
+      {% if s.statut == 'valide' %} · <span class="ok">vérifié</span>{% else %} · confiance {{ "%.0f"|format(s.confiance * 100) }} %{% endif %}</div>
+    </td>
+    {% for g in groupes %}<td>{{ position(detail.votes[s.scrutin_uid].get(g.abrev), s.polarite) }}</td>{% endfor %}
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

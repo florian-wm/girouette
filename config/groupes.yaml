@@ -1,0 +1,40 @@
+# Correspondance groupes parlementaires <-> partis français.
+# Table maintenue à la main et versionnée (cf. README §5).
+# Clé : abréviation officielle du groupe à l'Assemblée nationale (17e législature).
+groupes:
+  RN:
+    partis: [Rassemblement national]
+    couleur: "#0d378a"
+  EPR:
+    partis: [Renaissance]
+    couleur: "#ffd600"
+  LFI-NFP:
+    partis: [La France insoumise]
+    couleur: "#cc2443"
+  SOC:
+    partis: [Parti socialiste, Place publique]
+    couleur: "#ff8080"
+  DR:
+    partis: [Les Républicains]
+    couleur: "#0066cc"
+  ECOS:
+    partis: [Les Écologistes, Génération.s]
+    couleur: "#00c000"
+  DEM:
+    partis: [MoDem]
+    couleur: "#ff9900"
+  HOR:
+    partis: [Horizons]
+    couleur: "#0001b8"
+  LIOT:
+    partis: [Divers (régionalistes, centristes, ultramarins)]
+    couleur: "#a1a1a1"
+  GDR:
+    partis: [Parti communiste français, partis ultramarins]
+    couleur: "#dd0000"
+  UDR:
+    partis: [Union des droites pour la République (Ciotti)]
+    couleur: "#1a1a6e"
+  NI:
+    partis: [Non-inscrits]
+    couleur: "#cccccc"

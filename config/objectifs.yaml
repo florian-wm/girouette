@@ -1,0 +1,38 @@
+# Taxonomie des objectifs politiques suivis.
+# La description sert au classement LLM : elle définit le périmètre de l'objectif,
+# pas une opinion sur les moyens d'y parvenir.
+objectifs:
+  - slug: pauvrete
+    libelle: Réduire la pauvreté et les inégalités
+    description: >-
+      Minima sociaux, RSA, prime d'activité, allocations familiales, aide alimentaire,
+      hébergement d'urgence, lutte contre l'exclusion, redistribution, fiscalité ciblée
+      sur les ménages modestes ou les plus aisés, accès aux droits.
+
+  - slug: hopital
+    libelle: Sauver l'hôpital public et l'accès aux soins
+    description: >-
+      Moyens et personnels de l'hôpital public, ONDAM, déserts médicaux, urgences,
+      rémunération et conditions de travail des soignants, remboursement des soins,
+      franchises médicales, accès aux médicaments, santé mentale.
+
+  - slug: logement
+    libelle: Permettre à chacun de se loger
+    description: >-
+      Construction et rénovation de logements, logement social (HLM, SRU), APL,
+      encadrement des loyers, rapports locatifs, meublés de tourisme, accession à la
+      propriété, lutte contre l'habitat indigne et le sans-abrisme.
+
+  - slug: climat
+    libelle: Lutter contre le réchauffement climatique
+    description: >-
+      Réduction des émissions de gaz à effet de serre, énergies (renouvelables,
+      nucléaire, fossiles), rénovation énergétique, transports, zéro artificialisation
+      nette, fiscalité environnementale, adaptation au changement climatique.
+
+  - slug: pouvoir-achat
+    libelle: Défendre le pouvoir d'achat
+    description: >-
+      Salaires, SMIC, indexation des pensions et prestations, prix de l'énergie et des
+      carburants, TVA et impôts pesant sur la consommation, impôt sur le revenu des
+      ménages, prix alimentaires, chèques et boucliers tarifaires.

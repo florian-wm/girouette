@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import polarite_txt %}
+{% block title %}Back-office · Votes & intentions{% endblock %}
+{% block content %}
+<h1>Back-office</h1>
+<p class="meta">{{ stats.scrutins }} scrutins · {{ stats.analyses }} analysés · {{ stats.classes }} rattachés à un objectif · {{ stats.valides }} classements vérifiés ·
+analyses : {% for e in erreurs %}{{ e.statut }} {{ e.n }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+
+<h2>Pipeline</h2>
+{% if not llm %}<p class="notice">Aucune clé API pour le fournisseur « {{ fournisseur }} » (LLM_PROVIDER) : seule l'ingestion sera exécutée.</p>{% endif %}
+{% if en_cours %}<p class="notice">Pipeline en cours…</p>{% else %}
+<form method="post" action="/admin/pipeline" class="inline">
+  <label>Scrutins à classer max. <input type="number" name="limit" value="50" min="0" max="5000"></label>
+  <button>Lancer ingestion + classement</button>
+</form>{% endif %}
+<table class="simple">{% for r in runs %}<tr><td>{{ r.debut }}</td><td>{{ r.etape }}</td><td>{{ r.statut }}</td><td><code>{{ (r.details or '')[:200] }}</code></td></tr>{% endfor %}</table>
+
+<h2>Signalements ({{ signalements|length }})</h2>
+{% for sg in signalements %}
+<div class="classement-card">
+  <p><a href="/scrutins/{{ sg.scrutin_uid }}">{{ sg.titre[:140] }}</a> · {{ sg.objectif_slug or 'général' }} · {{ sg.created_at[:16] }}</p>
+  <p class="justif">{{ sg.message }}</p>
+  <form method="post" action="/admin/signalements/{{ sg.id }}/traiter"><button>Marquer traité</button></form>
+</div>
+{% else %}<p class="meta">Aucun signalement en attente.</p>{% endfor %}
+
+<h2>Classements à vérifier</h2>
+<form method="get" class="inline">
+  <select name="objectif"><option value="">Tous objectifs</option>{% for o in objectifs %}<option value="{{ o.slug }}" {% if o.slug == objectif %}selected{% endif %}>{{ o.libelle }}</option>{% endfor %}</select>
+  <select name="statut">{% for st in ['auto', 'valide', 'rejete'] %}<option {% if st == statut %}selected{% endif %}>{{ st }}</option>{% endfor %}</select>
+  <button>Filtrer</button>
+</form>
+{% for c in a_valider %}
+<div class="classement-card {{ c.statut }}">
+  <p><a href="/scrutins/{{ c.scrutin_uid }}">n° {{ c.numero }} · {{ c.titre[:160] }}</a></p>
+  <p><strong>{{ c.objectif_slug }}</strong> · {{ polarite_txt(c.polarite) }} · confiance {{ "%.0f"|format(c.confiance * 100) }} % · {{ c.nature }}</p>
+  <p class="justif">{{ c.justification }}</p>
+  <form method="post" action="/admin/classements/{{ c.id }}" class="inline">
+    <input type="hidden" name="retour" value="/admin?objectif={{ objectif }}&statut={{ statut }}">
+    {% if c.statut == 'auto' %}
+    <button name="action" value="valider">Valider</button>
+    <button name="action" value="inverser">Inverser le sens</button>
+    <button name="action" value="rejeter">Rejeter</button>
+    {% else %}<button name="action" value="reouvrir">Rouvrir</button>{% endif %}
+  </form>
+</div>
+{% else %}<p class="meta">Rien à afficher.</p>{% endfor %}
+{% endblock %}

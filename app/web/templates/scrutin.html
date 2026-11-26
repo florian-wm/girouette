@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "_macros.html" import groupe_tag, position, polarite_txt %}
+{% block title %}Scrutin n° {{ s.numero }} · Votes & intentions{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/">Objectifs</a></p>
+<h1>Scrutin n° {{ s.numero }} du {{ s.date|date_fr }}</h1>
+{% if analyse and analyse.resume %}<p class="lead">{{ analyse.resume }}</p>{% endif %}
+<p><strong>Intitulé officiel :</strong> {{ s.titre }}</p>
+<p class="meta">{{ NATURES[s.nature] }}{% if s.dossier_libelle %} · dossier : {{ s.dossier_libelle }}{% endif %} ·
+<strong>{{ s.sort }}</strong> ({{ s.pour }} pour, {{ s.contre }} contre, {{ s.abstentions }} abstentions) ·
+<a href="https://www.assemblee-nationale.fr/dyn/{{ s.legislature }}/scrutins/{{ s.numero }}">voir sur le site de l'Assemblée</a></p>
+
+{% if s.nature == 'amendement' %}
+  {% if s.amendement_expose or s.amendement_dispositif %}
+  <details class="amdt" open><summary>Texte de l'amendement{% if s.amendement_auteur %} ({{ s.amendement_auteur[:120] }}{% if s.amendement_auteur|length > 120 %}…{% endif %}){% endif %}</summary>
+    {% if s.amendement_dispositif %}<h4>Dispositif</h4><div class="txt">{{ s.amendement_dispositif }}</div>{% endif %}
+    {% if s.amendement_expose %}<h4>Exposé sommaire</h4><div class="txt">{{ s.amendement_expose }}</div>{% endif %}
+  </details>
+  {% else %}
+  <p class="notice">Le texte de cet amendement n'a pas pu être retrouvé automatiquement : le classement repose sur le seul intitulé.</p>
+  {% endif %}
+{% endif %}
+
+<h2>Objectifs concernés</h2>
+{% if not analyse %}<p class="meta">Ce scrutin n'a pas encore été analysé.</p>
+{% elif analyse.statut != 'ok' %}<p class="notice">Analyse impossible ({{ analyse.statut }}).</p>
+{% elif not classements %}<p class="meta">Aucun des objectifs suivis n'est directement concerné par ce scrutin.</p>
+{% endif %}
+{% for c in classements %}
+<div class="classement-card {{ c.statut }}">
+  <h3><a href="/objectifs/{{ c.objectif_slug }}">{{ objectifs[c.objectif_slug].libelle if c.objectif_slug in objectifs else c.objectif_slug }}</a></h3>
+  <p>{{ polarite_txt(c.polarite) }}
+    {% if c.statut == 'valide' %}<span class="ok">· vérifié par l'équipe</span>
+    {% elif c.statut == 'rejete' %}<span class="ko">· classement rejeté par l'équipe, non compté</span>
+    {% else %}· classement automatique, confiance {{ "%.0f"|format(c.confiance * 100) }} %{% endif %}</p>
+  <p class="justif">{{ c.justification }}</p>
+  <p class="meta">Modèle {{ c.modele }}, prompt {{ c.prompt_version }}</p>
+</div>
+{% endfor %}
+
+<h2>Vote des groupes</h2>
+<table class="votes">
+  <thead><tr><th>Groupe</th><th>Pour</th><th>Contre</th><th>Abst.</th><th>Non-votants</th><th>Position</th>
+  {% for c in classements if c.statut != 'rejete' %}<th>{{ c.objectif_slug }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for v in votes %}{% set g = groupes.get(v.groupe_uid, {'abrev': v.groupe_uid}) %}
+  <tr><td>{{ groupe_tag(g) }}</td><td>{{ v.pour }}</td><td>{{ v.contre }}</td><td>{{ v.abstentions }}</td><td>{{ v.non_votants }}</td>
+  <td>{{ v.position_majoritaire }}</td>
+  {% for c in classements if c.statut != 'rejete' %}<td>{{ position(v, c.polarite) }}</td>{% endfor %}</tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if historique %}
+<details><summary>Historique des classements ({{ historique|length }})</summary>
+<ul class="histo">{% for h in historique %}<li>{{ h.at[:16] }} · {{ h.objectif_slug }} · {{ h.action }} par {{ h.auteur }}{% if h.apres %} → <code>{{ h.apres }}</code>{% endif %}</li>{% endfor %}</ul>
+</details>
+{% endif %}
+
+<h2 id="signaler">Signaler une erreur</h2>
+{% if merci %}<p class="ok">Merci, votre signalement a été transmis à l'équipe.</p>{% endif %}
+<form method="post" action="/scrutins/{{ s.uid }}/signaler" class="signaler">
+  <label>Objectif concerné
+    <select name="objectif"><option value="">(général)</option>
+    {% for slug, o in objectifs.items() %}<option value="{{ slug }}">{{ o.libelle }}</option>{% endfor %}</select></label>
+  <label>Qu'est-ce qui ne va pas ?<textarea name="message" required maxlength="2000" rows="3"></textarea></label>
+  <input type="text" name="site_web" class="hp" tabindex="-1" autocomplete="off">
+  <button type="submit">Envoyer</button>
+</form>
+{% endblock %}
